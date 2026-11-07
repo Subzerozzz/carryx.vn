@@ -28,12 +28,13 @@ function createBag(color) {
   const stitching = new THREE.MeshStandardMaterial({ color: color === 'brown' ? '#bf926b' : '#5c5c59', roughness: .9 });
   const leatherParts = [leather, edge, stitching];
   function rounded(w, h, d, x, y, z, mat = leather, r = .1) {
-    const n = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 5, Math.min(r, d / 2 - .001)), mat);
+    const segments = Math.min(w, h, d) < .15 ? 1 : 3;
+    const n = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, segments, Math.min(r, d / 2 - .001)), mat);
     n.position.set(x, y, z); n.castShadow = true; n.receiveShadow = true; bag.add(n); return n;
   }
   function line(points, material = edge, radius = .012) {
     const curve = new THREE.CatmullRomCurve3(points.map(v => new THREE.Vector3(...v)));
-    const n = new THREE.Mesh(new THREE.TubeGeometry(curve, 40, radius, 6, false), material); n.castShadow = true; bag.add(n); return n;
+    const n = new THREE.Mesh(new THREE.TubeGeometry(curve, 28, radius, 6, false), material); n.castShadow = true; bag.add(n); return n;
   }
   function panel(w, h, depth, x, y, z, material = leather, r = .22) {
     const shape = new THREE.Shape(), l = -w / 2, b = -h / 2;
@@ -96,48 +97,90 @@ function createBag(color) {
 
 export class ProductViewer {
   constructor(element, { color = 'black', compact = false } = {}) {
-    this.element = element; this.color = color; this.compact = compact; this.visible = false; this.dead = false; this.auto = false; this.targetY = 0;
+    this.element = element; this.color = color; this.visible = false; this.dead = false; this.paused = false; this.auto = false; this.targetY = 0;
+    this.dirty = true; this.raf = null; this.last = null;
     this.stage = element.querySelector('.viewer-stage');
     this.canvas = document.createElement('canvas'); this.canvas.setAttribute('aria-label', 'Mô phỏng 3D balo CarryX. Kéo để xoay, dùng nút để đổi góc.'); this.canvas.setAttribute('role', 'img'); this.canvas.tabIndex = 0;
-    try { this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, alpha: true, powerPreference: 'low-power' }); }
-    catch { this.fail('Thiết bị chưa hỗ trợ 3D. Bạn vẫn có thể xem ảnh thật.'); return; }
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.8)); this.renderer.outputColorSpace = THREE.SRGBColorSpace; this.renderer.toneMapping = THREE.ACESFilmicToneMapping; this.renderer.toneMappingExposure = 1.15;
+    this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, alpha: true, powerPreference: 'low-power' });
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, compact ? 1.25 : 1.5)); this.renderer.outputColorSpace = THREE.SRGBColorSpace; this.renderer.toneMapping = THREE.ACESFilmicToneMapping; this.renderer.toneMappingExposure = 1.15;
     this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.autoUpdate = false;
+    this.renderer.shadowMap.needsUpdate = true;
     this.scene = new THREE.Scene(); this.camera = new THREE.PerspectiveCamera(34, 1, .1, 50); this.camera.position.set(-3.7, 1.05, 6.4);
-    const pmrem = new THREE.PMREMGenerator(this.renderer); const room = new RoomEnvironment(); this.environment = pmrem.fromScene(room, .04); this.scene.environment = this.environment.texture; room.dispose(); pmrem.dispose();
+    const pmrem = new THREE.PMREMGenerator(this.renderer); const room = new RoomEnvironment(); this.environment = pmrem.fromScene(room, .04, .1, 100, { size: 128 }); this.scene.environment = this.environment.texture; room.dispose(); pmrem.dispose();
     const ambient = new THREE.HemisphereLight('#fff8ec', '#a69d8e', 2.3); this.scene.add(ambient);
-    const key = new THREE.DirectionalLight('#fff7eb', 3.3); key.position.set(-3, 6, 5); key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.camera.left = -4; key.shadow.camera.right = 4; key.shadow.camera.top = 4; key.shadow.camera.bottom = -4; key.shadow.normalBias = .04; this.scene.add(key);
+    const key = new THREE.DirectionalLight('#fff7eb', 3.3); key.position.set(-3, 6, 5); key.castShadow = true; key.shadow.mapSize.set(512, 512); key.shadow.camera.left = -4; key.shadow.camera.right = 4; key.shadow.camera.top = 4; key.shadow.camera.bottom = -4; key.shadow.normalBias = .04; this.scene.add(key);
     const rim = new THREE.DirectionalLight('#ffffff', 2.2); rim.position.set(4, 3, -4); this.scene.add(rim);
     this.bag = createBag(color); this.bag.position.y = .06; this.scene.add(this.bag);
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), new THREE.ShadowMaterial({ color: '#5e4a2e', opacity: .14 })); floor.rotation.x = -Math.PI / 2; floor.position.y = -1.57; floor.receiveShadow = true; this.scene.add(floor);
     this.controls = new OrbitControls(this.camera, this.canvas); this.controls.enableDamping = true; this.controls.dampingFactor = .08; this.controls.enablePan = false; this.controls.enableZoom = !compact; this.controls.minDistance = 4.8; this.controls.maxDistance = 10; this.controls.minPolarAngle = Math.PI * .22; this.controls.maxPolarAngle = Math.PI * .65; this.controls.rotateSpeed = .7; this.controls.target.set(0, .1, 0); this.controls.update(); this.controls.saveState();
     this.onStart = () => { this.setAuto(false); this.targetY = this.bag.rotation.y; element.classList.add('interacted'); };
     this.controls.addEventListener('start', this.onStart);
-    this.stage.append(this.canvas); element.classList.add('viewer-ready');
+    this.controls.addEventListener('change', this.invalidate);
+    this.stage.append(this.canvas);
     this.resizeObserver = new ResizeObserver(() => this.resize()); this.resizeObserver.observe(this.stage); this.resize();
-    this.visibilityObserver = new IntersectionObserver(([entry]) => { this.visible = entry.isIntersecting; }, { rootMargin: '80px' }); this.visibilityObserver.observe(element);
+    this.visibilityObserver = new IntersectionObserver(([entry]) => {
+      this.visible = entry.isIntersecting;
+      this.syncActivity();
+    });
+    this.visibilityObserver.observe(this.stage);
+    document.addEventListener('visibilitychange', this.syncActivity);
     this.onKey = e => { if (['ArrowLeft', 'ArrowRight', 'Home'].includes(e.key)) { e.preventDefault(); if (e.key === 'Home') this.reset(); else this.rotate(e.key === 'ArrowLeft' ? -1 : 1); } };
     this.canvas.addEventListener('keydown', this.onKey);
-    this.last = performance.now(); this.animate();
   }
-  resize() { if (!this.renderer) return; const { width, height } = this.stage.getBoundingClientRect(); if (!width || !height) return; this.renderer.setSize(width, height, false); this.camera.aspect = width / height; this.camera.updateProjectionMatrix(); }
-  animate = () => {
-    if (this.dead) return;
-    this.raf = requestAnimationFrame(this.animate);
-    if (!this.visible || document.hidden || this.element.dataset.mode === 'photo') return;
-    const now = performance.now(), delta = Math.min((now - this.last) / 1000, .05); this.last = now;
-    if (this.auto) this.targetY += delta * .26;
-    this.bag.rotation.y = THREE.MathUtils.lerp(this.bag.rotation.y, this.targetY, .09);
-    this.controls.update(); this.renderer.render(this.scene, this.camera);
+  resize() {
+    const { clientWidth: width, clientHeight: height } = this.stage;
+    if (!width || !height || (width === this.width && height === this.height)) return;
+    this.width = width; this.height = height;
+    this.renderer.setSize(width, height, false);
+    this.camera.aspect = width / height;
+    this.camera.updateProjectionMatrix();
+    this.invalidate();
+  }
+  isActive() { return !this.dead && !this.paused && this.visible && !document.hidden && this.element.dataset.mode === '3d'; }
+  scheduleFrame() {
+    if (this.raf === null && this.isActive()) this.raf = requestAnimationFrame(this.renderFrame);
+  }
+  invalidate = () => { this.dirty = true; this.scheduleFrame(); };
+  syncActivity = () => {
+    if (this.isActive()) this.invalidate();
+    else {
+      cancelAnimationFrame(this.raf);
+      this.raf = null;
+      this.last = null;
+    }
   };
-  rotate(direction) { if (!this.bag) return; this.setAuto(false); this.targetY += direction * Math.PI / 2; this.element.classList.add('interacted'); }
-  setAuto(on) { this.auto = on; const b = this.element.querySelector('[data-view-action="auto"]'); if (b) { b.setAttribute('aria-pressed', String(on)); b.setAttribute('aria-label', on ? 'Dừng tự xoay' : 'Tự xoay sản phẩm'); b.innerHTML = on ? '<span aria-hidden="true">Ⅱ</span>' : '<span aria-hidden="true">▷</span>'; } }
-  setColor(color) { if (!this.bag) return; this.color = color; const [leather, edge, stitch] = this.bag.userData.leatherParts; leather.color.set(color === 'brown' ? '#754226' : '#111317'); edge.color.set(color === 'brown' ? '#49301e' : '#0b0d10'); stitch.color.set(color === 'brown' ? '#bf926b' : '#5c5c59'); }
-  reset() { if (!this.controls) return; this.setAuto(false); this.targetY = 0; this.controls.reset(); }
-  fail(message) {
-    this.element.classList.add('viewer-unavailable'); this.element.dataset.mode = 'photo'; this.element.querySelector('.viewer-note').textContent = message;
-    this.element.querySelector('[data-view-action="auto"]').disabled = true;
-    this.element.querySelectorAll('[data-view-mode]').forEach(b => { const photo = b.dataset.viewMode === 'photo'; b.classList.toggle('active', photo); b.setAttribute('aria-pressed', String(photo)); if (!photo) b.disabled = true; });
-  }
-  dispose() { this.dead = true; cancelAnimationFrame(this.raf); this.resizeObserver?.disconnect(); this.visibilityObserver?.disconnect(); this.controls?.dispose(); this.canvas.removeEventListener('keydown', this.onKey); if (this.scene) this.scene.traverse(n => { n.geometry?.dispose(); if (n.material) (Array.isArray(n.material) ? n.material : [n.material]).forEach(m => m.dispose()); }); this.environment?.dispose(); this.renderer?.dispose(); this.renderer?.forceContextLoss(); this.canvas.remove(); }
+  setPaused(paused) { this.paused = paused; this.syncActivity(); }
+  renderFrame = (now) => {
+    if (!this.isActive()) { this.raf = null; this.last = null; return; }
+    // Keep the current frame marked as pending while OrbitControls dispatches change.
+    const delta = this.last === null ? 1 / 60 : Math.min((now - this.last) / 1000, .05);
+    this.last = now;
+    if (this.auto) this.targetY += delta * .26;
+    const rotation = this.bag.rotation.y;
+    const turning = Math.abs(this.targetY - rotation) > .001;
+    const nextRotation = turning ? THREE.MathUtils.lerp(rotation, this.targetY, 1 - Math.exp(-6 * delta)) : this.targetY;
+    if (rotation !== nextRotation) {
+      this.bag.rotation.y = nextRotation;
+      this.renderer.shadowMap.needsUpdate = true;
+      this.dirty = true;
+    }
+    const cameraChanged = this.controls.update();
+    if (this.dirty || cameraChanged) {
+      this.dirty = false;
+      this.renderer.render(this.scene, this.camera);
+      if (!this.ready) {
+        this.ready = true;
+        this.element.classList.add('viewer-ready');
+      }
+    }
+    this.raf = null;
+    if (this.auto || turning || cameraChanged) this.scheduleFrame();
+    else this.last = null;
+  };
+  rotate(direction) { this.setAuto(false); this.targetY += direction * Math.PI / 2; this.element.classList.add('interacted'); this.invalidate(); }
+  setAuto(on) { if (this.auto === on) return; this.auto = on; const b = this.element.querySelector('[data-view-action="auto"]'); if (b) { b.setAttribute('aria-pressed', String(on)); b.setAttribute('aria-label', on ? 'Dừng tự xoay' : 'Tự xoay sản phẩm'); b.innerHTML = on ? '<span aria-hidden="true">Ⅱ</span>' : '<span aria-hidden="true">▷</span>'; } this.invalidate(); }
+  setColor(color) { if (this.color === color) return; this.color = color; const [leather, edge, stitch] = this.bag.userData.leatherParts; leather.color.set(color === 'brown' ? '#754226' : '#111317'); edge.color.set(color === 'brown' ? '#49301e' : '#0b0d10'); stitch.color.set(color === 'brown' ? '#bf926b' : '#5c5c59'); this.invalidate(); }
+  reset() { this.setAuto(false); this.targetY = 0; this.controls.reset(); this.invalidate(); }
+  dispose() { this.dead = true; this.syncActivity(); document.removeEventListener('visibilitychange', this.syncActivity); this.resizeObserver.disconnect(); this.visibilityObserver.disconnect(); this.controls.removeEventListener('change', this.invalidate); this.controls.dispose(); this.canvas.removeEventListener('keydown', this.onKey); this.scene.traverse(n => { n.geometry?.dispose(); if (n.material) (Array.isArray(n.material) ? n.material : [n.material]).forEach(m => m.dispose()); }); this.environment.dispose(); this.renderer.dispose(); this.renderer.forceContextLoss(); this.canvas.remove(); }
 }
