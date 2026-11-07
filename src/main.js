@@ -131,8 +131,6 @@ function setPhoto(el, index) {
 function toast(message) { const t = $('#toast'); t.textContent = message; t.classList.add('visible'); clearTimeout(toast.timer); toast.timer = setTimeout(() => t.classList.remove('visible'), 2600); }
 
 document.addEventListener('click', async e => {
-  const pendingSocial = e.target.closest('[data-social-pending]');
-  if (pendingSocial) toast(`Đường dẫn ${pendingSocial.dataset.socialPending} của CarryX đang được cập nhật.`);
   if (e.target.closest('.skip-link')) { e.preventDefault(); main.focus(); main.scrollIntoView({ behavior: 'instant' }); return; }
   const menu = e.target.closest('.menu-toggle'); if (menu) { const open = menu.getAttribute('aria-expanded') !== 'true'; menu.setAttribute('aria-expanded', String(open)); $('#mobile-menu').inert = !open; document.body.classList.toggle('menu-open', open); }
   if (e.target.closest('#mobile-menu a')) closeMenu();
