@@ -41,11 +41,14 @@ function home() {
 
 function roadmapPanel(index = 0) {
   const r = roadmap[index];
-  const cards = r.items.map(([name, desc, hasImage = true]) => {
+  const cards = r.items.map(([name, desc, conceptImage]) => {
     const image = name.toLowerCase().replaceAll(' ', '-');
-    return `<li class="roadmap-card${hasImage ? '' : ' roadmap-card-text'}">
-      ${hasImage ? `<div class="roadmap-card-image">${photo(`roadmap/${image}`, `Minh họa CarryX ${name}`)}</div>` : `<span class="roadmap-card-tag eyebrow">DỰ KIẾN · NĂM ${r.year}</span>`}
-      <div class="roadmap-card-copy"><h4>CarryX ${name}</h4><p>${desc}</p></div>
+    const illustration = conceptImage
+      ? `<img src="/images/roadmap/${conceptImage}" alt="Minh họa ý tưởng CarryX ${name}" loading="lazy" decoding="async" />`
+      : photo(`roadmap/${image}`, `Minh họa CarryX ${name}`);
+    return `<li class="roadmap-card">
+      <div class="roadmap-card-image">${illustration}</div>
+      <div class="roadmap-card-copy"><h4>CarryX ${name}</h4>${conceptImage ? '<span class="roadmap-concept-label">Minh họa ý tưởng</span>' : ''}<p>${desc}</p></div>
     </li>`;
   });
   return `<div class="roadmap-year">
