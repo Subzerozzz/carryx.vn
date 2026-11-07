@@ -38,13 +38,25 @@ function home() {
 
 const roadmap = [
   { year: 2, title: 'Nhịp sống trẻ', photo: 'campus', desc: 'Gọn nhẹ cho học tập và những cuộc hẹn thường ngày.', items: [['Lite Backpack', 'Balo thông minh dễ tiếp cận, khóa vân tay, laptop 15.6”.'], ['Sling', 'Túi đeo chéo nhỏ gọn với khóa vân tay.'], ['Laptop Sleeve', 'Lớp đệm bảo vệ laptop, dùng riêng hoặc trong balo.'], ['Active Gym Bag', 'Tách riêng ngăn giày, đồ ướt và quần áo sạch.'], ['Urban Waist Bag', 'Túi đeo hông hoặc trước ngực cho vật dụng nhỏ.']] },
-  { year: 3, title: 'Phụ kiện & kết nối', photo: 'inside', desc: 'Mọi vật dụng nhỏ đều có một vị trí riêng.', items: [['Tech Organizer', 'Sắp xếp cáp, sạc, chuột và phụ kiện điện tử.'], ['Smart Tracker', 'Thiết bị Bluetooth hỗ trợ tìm balo và chìa khóa.'], ['RFID Wallet', 'Ví với chất liệu cản RFID cho thẻ không tiếp xúc.'], ['Power Bank', 'Sạc dự phòng có cổng USB-C.'], ['Corporate Gift Set', 'Kết hợp túi, ví và phụ kiện, dự kiến tùy chỉnh logo.']] },
+  { year: 3, title: 'Phụ kiện & kết nối', photo: 'inside', desc: 'Mọi vật dụng nhỏ đều có một vị trí riêng.', items: [['Tech Organizer', 'Sắp xếp cáp, sạc, chuột và phụ kiện điện tử.'], ['Smart Tracker', 'Thiết bị Bluetooth hỗ trợ tìm balo và chìa khóa.', false], ['RFID Wallet', 'Ví với chất liệu cản RFID cho thẻ không tiếp xúc.'], ['Power Bank', 'Sạc dự phòng có cổng USB-C.'], ['Corporate Gift Set', 'Kết hợp túi, ví và phụ kiện, dự kiến tùy chỉnh logo.']] },
   { year: 4, title: 'Ngày làm việc chỉn chu', photo: 'hero', desc: 'Dành cho công việc và những lịch trình linh hoạt.', items: [['Pro Backpack', 'Balo cao cấp, laptop 17”, khóa vân tay cải tiến.'], ['Smart Tote', 'Túi tote đứng, ngăn laptop 14” và ngăn bảo mật.'], ['Executive Briefcase', 'Cặp công tác bảo vệ tài liệu A4 và laptop.'], ['Creator Tech Bag', 'Vách ngăn tháo rời cho máy ảnh và thiết bị sáng tạo.'], ['Convertible Work Bag', 'Chuyển giữa túi xách và balo bằng quai đeo ẩn.']] },
   { year: 5, title: 'Hành trang đi xa', photo: 'journey', desc: 'Từ chuyến công tác ngắn đến những hành trình mới.', items: [['Smart Carry-on', 'Vali 20”, khóa vân tay và bánh xe 360°.'], ['Travel Backpack', 'Balo 30–35L mở kiểu vali cho chuyến đi 2–4 ngày.'], ['Travel Toiletry Bag', 'Tách đồ khô/ướt, lót dễ vệ sinh, có móc treo.'], ['Passport Security Pouch', 'Túi bảo vệ hộ chiếu, giấy tờ và tiền mặt.']] },
 ];
 function roadmapPanel(index = 0) {
   const r = roadmap[index];
-  return `<div class="roadmap-visual">${photo(r.photo, r.title)}<span>DỰ KIẾN / NĂM ${r.year}</span></div><div class="roadmap-content"><span class="eyebrow">CARRYX / THE ROAD AHEAD</span><h3>${r.title}</h3><p>${r.desc}</p><ol class="roadmap-list">${r.items.map(([name, desc], i) => `<li><span class="list-number">0${i + 1}</span><div><h4>CarryX ${name}</h4><p>${desc}</p></div><span class="planned-dot" title="Dự kiến"></span></li>`).join('')}</ol></div>`;
+  const cards = r.items.map(([name, desc, hasImage = true]) => {
+    const image = name.toLowerCase().replaceAll(' ', '-');
+    return `<li class="roadmap-card">
+      <div class="roadmap-card-image">${hasImage ? photo(`roadmap/${image}`, `Minh họa CarryX ${name}`) : '<span>Đang cập nhật ảnh</span>'}</div>
+      <div class="roadmap-card-copy"><h4>CarryX ${name}</h4><p>${desc}</p></div>
+    </li>`;
+  });
+  return `<div class="roadmap-year">
+    <div class="roadmap-visual">${photo(r.photo, '')}</div>
+    <div class="roadmap-content"><span class="eyebrow">DỰ KIẾN / NĂM ${r.year}</span><h3>${r.title}</h3><p>${r.desc}</p></div>
+  </div>
+  <p class="roadmap-image-label">Ảnh minh họa sản phẩm dự kiến</p>
+  <ul class="roadmap-list" role="list">${cards.join('')}</ul>`;
 }
 function products() {
   return `<section class="section page-intro"><div class="container">${heading('BỘ SƯU TẬP CARRYX', 'Hai sắc màu.<br/>Một người bạn đồng hành.', 'Khám phá hai phiên bản Smart Backpack dành cho học tập, công việc và nhịp sống mỗi ngày.', 'large-heading')}<p class="intro-360" data-reveal>Khám phá từng góc với mô phỏng 3D 360°, hoặc chuyển sang ảnh chụp thật.</p>${productCards()}</div></section><section class="section section-white"><div class="container detail-invitation"><div class="image-wrap" data-reveal>${photo('together', 'Hai màu balo CarryX trong đời sống thực tế')}</div><div data-reveal><span class="eyebrow">NHÌN GẦN HƠN</span><h2>Chọn màu.<br/>Xem từng góc.</h2><p>Khám phá khóa vân tay, cổng USB, ngăn laptop và chất liệu của cả hai phiên bản.</p>${button('Xem chi tiết sản phẩm', '#/san-pham/smart-backpack', 'button-outline')}</div></div></section><section class="section roadmap-section"><div class="container">${heading('HỆ SINH THÁI ĐANG PHÁT TRIỂN', 'Cho nhiều cách di chuyển hơn.', '19 ý tưởng sản phẩm trong lộ trình Năm 2–5. Từng bước mở rộng, bắt đầu từ nhu cầu thực tế.')}<div class="roadmap-tabs" role="tablist" aria-label="Lộ trình sản phẩm" data-reveal>${roadmap.map((r, i) => `<button id="year-tab-${i}" role="tab" aria-selected="${i === 0}" aria-controls="roadmap-panel" tabindex="${i === 0 ? '0' : '-1'}" data-year="${i}"><span>Năm ${r.year}</span><small>${['Nhịp sống trẻ', 'Phụ kiện', 'Công sở', 'Du lịch'][i]}</small></button>`).join('')}</div><div id="roadmap-panel" class="roadmap-panel" role="tabpanel" tabindex="0" aria-labelledby="year-tab-0" data-reveal>${roadmapPanel()}</div><p class="roadmap-note">Các dòng sản phẩm trên đang ở giai đoạn định hướng, chưa phải danh mục đang bán. Tính năng và thời điểm ra mắt có thể được điều chỉnh.</p></div></section>${cta()}`;
