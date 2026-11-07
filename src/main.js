@@ -1,3 +1,6 @@
+import { roadmap } from './catalog.js';
+import './carryx-assistant.js';
+
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 const main = $('#main');
@@ -36,18 +39,12 @@ function home() {
   <section class="section section-white story-section"><div class="container"><div class="story-photo image-wrap" data-reveal>${photo('journey', 'Hai người bạn mang balo CarryX Đen và Nâu trên đường đi')}</div><div class="story-grid"><div data-reveal><span class="eyebrow">NHỮNG NGƯỜI THẬT. NHỮNG HÀNH TRÌNH THẬT.</span><h2>Từ một ý tưởng nhỏ,<br/>đến người bạn mỗi ngày.</h2></div><div data-reveal><p>CarryX bắt đầu từ nhóm sinh viên Đại học FPT và một mong muốn gần gũi: giúp việc mang theo đồ dùng mỗi ngày trở nên tiện lợi và an tâm hơn.</p>${button('Gặp gỡ CarryX', '#/ve-carryx', 'button-outline')}</div></div></div></section>${cta()}`;
 }
 
-const roadmap = [
-  { year: 2, title: 'Nhịp sống trẻ', photo: 'campus', desc: 'Gọn nhẹ cho học tập và những cuộc hẹn thường ngày.', items: [['Lite Backpack', 'Balo thông minh dễ tiếp cận, khóa vân tay, laptop 15.6”.'], ['Sling', 'Túi đeo chéo nhỏ gọn với khóa vân tay.'], ['Laptop Sleeve', 'Lớp đệm bảo vệ laptop, dùng riêng hoặc trong balo.'], ['Active Gym Bag', 'Tách riêng ngăn giày, đồ ướt và quần áo sạch.'], ['Urban Waist Bag', 'Túi đeo hông hoặc trước ngực cho vật dụng nhỏ.']] },
-  { year: 3, title: 'Phụ kiện & kết nối', photo: 'inside', desc: 'Mọi vật dụng nhỏ đều có một vị trí riêng.', items: [['Tech Organizer', 'Sắp xếp cáp, sạc, chuột và phụ kiện điện tử.'], ['Smart Tracker', 'Thiết bị Bluetooth hỗ trợ tìm balo và chìa khóa.', false], ['RFID Wallet', 'Ví với chất liệu cản RFID cho thẻ không tiếp xúc.'], ['Power Bank', 'Sạc dự phòng có cổng USB-C.'], ['Corporate Gift Set', 'Kết hợp túi, ví và phụ kiện, dự kiến tùy chỉnh logo.']] },
-  { year: 4, title: 'Ngày làm việc chỉn chu', photo: 'hero', desc: 'Dành cho công việc và những lịch trình linh hoạt.', items: [['Pro Backpack', 'Balo cao cấp, laptop 17”, khóa vân tay cải tiến.'], ['Smart Tote', 'Túi tote đứng, ngăn laptop 14” và ngăn bảo mật.'], ['Executive Briefcase', 'Cặp công tác bảo vệ tài liệu A4 và laptop.'], ['Creator Tech Bag', 'Vách ngăn tháo rời cho máy ảnh và thiết bị sáng tạo.'], ['Convertible Work Bag', 'Chuyển giữa túi xách và balo bằng quai đeo ẩn.']] },
-  { year: 5, title: 'Hành trang đi xa', photo: 'journey', desc: 'Từ chuyến công tác ngắn đến những hành trình mới.', items: [['Smart Carry-on', 'Vali 20”, khóa vân tay và bánh xe 360°.'], ['Travel Backpack', 'Balo 30–35L mở kiểu vali cho chuyến đi 2–4 ngày.'], ['Travel Toiletry Bag', 'Tách đồ khô/ướt, lót dễ vệ sinh, có móc treo.'], ['Passport Security Pouch', 'Túi bảo vệ hộ chiếu, giấy tờ và tiền mặt.']] },
-];
 function roadmapPanel(index = 0) {
   const r = roadmap[index];
   const cards = r.items.map(([name, desc, hasImage = true]) => {
     const image = name.toLowerCase().replaceAll(' ', '-');
-    return `<li class="roadmap-card">
-      <div class="roadmap-card-image">${hasImage ? photo(`roadmap/${image}`, `Minh họa CarryX ${name}`) : '<span>Đang cập nhật ảnh</span>'}</div>
+    return `<li class="roadmap-card${hasImage ? '' : ' roadmap-card-text'}">
+      ${hasImage ? `<div class="roadmap-card-image">${photo(`roadmap/${image}`, `Minh họa CarryX ${name}`)}</div>` : `<span class="roadmap-card-tag eyebrow">DỰ KIẾN · NĂM ${r.year}</span>`}
       <div class="roadmap-card-copy"><h4>CarryX ${name}</h4><p>${desc}</p></div>
     </li>`;
   });
@@ -131,6 +128,8 @@ function setPhoto(el, index) {
 function toast(message) { const t = $('#toast'); t.textContent = message; t.classList.add('visible'); clearTimeout(toast.timer); toast.timer = setTimeout(() => t.classList.remove('visible'), 2600); }
 
 document.addEventListener('click', async e => {
+  const pendingSocial = e.target.closest('[data-social-pending]');
+  if (pendingSocial) toast(`Đường dẫn ${pendingSocial.dataset.socialPending} của CarryX đang được cập nhật.`);
   if (e.target.closest('.skip-link')) { e.preventDefault(); main.focus(); main.scrollIntoView({ behavior: 'instant' }); return; }
   const menu = e.target.closest('.menu-toggle'); if (menu) { const open = menu.getAttribute('aria-expanded') !== 'true'; menu.setAttribute('aria-expanded', String(open)); $('#mobile-menu').inert = !open; document.body.classList.toggle('menu-open', open); }
   if (e.target.closest('#mobile-menu a')) closeMenu();
