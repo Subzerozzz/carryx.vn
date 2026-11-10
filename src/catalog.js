@@ -1,3 +1,7 @@
+const backpackPrices = { black: 1199000, brown: 1099000 };
+const priceFormat = new Intl.NumberFormat('vi-VN');
+export const formatBackpackPrice = (color) => priceFormat.format(backpackPrices[color]);
+
 export const roadmap = [
   { year: 2, title: 'Nhịp sống trẻ', photo: 'campus', desc: 'Gọn nhẹ cho học tập và những cuộc hẹn thường ngày.', items: [['Lite Backpack', 'Balo thông minh dễ tiếp cận, khóa vân tay, laptop 15.6”.'], ['Sling', 'Túi đeo chéo nhỏ gọn với khóa vân tay.'], ['Laptop Sleeve', 'Lớp đệm bảo vệ laptop, dùng riêng hoặc trong balo.'], ['Active Gym Bag', 'Tách riêng ngăn giày, đồ ướt và quần áo sạch.'], ['Urban Waist Bag', 'Túi đeo hông hoặc trước ngực cho vật dụng nhỏ.']] },
   { year: 3, title: 'Phụ kiện & kết nối', photo: 'inside', desc: 'Mọi vật dụng nhỏ đều có một vị trí riêng.', items: [['Tech Organizer', 'Sắp xếp cáp, sạc, chuột và phụ kiện điện tử.'], ['Smart Tracker', 'Thiết bị Bluetooth giúp tìm balo hoặc chìa khóa qua ứng dụng tương thích.', 'smart-tracker.svg'], ['RFID Wallet', 'Ví với chất liệu cản RFID cho thẻ không tiếp xúc.'], ['Power Bank', 'Sạc dự phòng có cổng USB-C.'], ['Corporate Gift Set', 'Kết hợp túi, ví và phụ kiện, dự kiến tùy chỉnh logo.']] },

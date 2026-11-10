@@ -1,4 +1,4 @@
-import { roadmap } from './catalog.js';
+import { formatBackpackPrice, roadmap } from './catalog.js';
 
 const normalize = (value) => value.toLowerCase().normalize('NFD')
   .replace(/\p{Diacritic}/gu, '').replaceAll('đ', 'd')
@@ -17,7 +17,7 @@ const plannedProducts = roadmap.flatMap(({ year, items }) => items.map(([name, d
 })));
 
 const topics = [
-  [/\b(gia|bao nhieu tien|bao tien|chi phi)\b/, 'Giá dự kiến của CarryX Smart Backpack là 1.199.000 ₫. Bạn có thể nhắn Zalo để hỏi giá và tình trạng đặt hàng hiện tại.'],
+  [/\b(gia|bao nhieu tien|bao tien|chi phi)\b/, `Giá dự kiến của CarryX Smart Backpack là ${formatBackpackPrice('black')} ₫ cho màu Đen và ${formatBackpackPrice('brown')} ₫ cho màu Nâu. Bạn có thể nhắn Zalo để hỏi tình trạng đặt hàng.`],
   [/\b(mau|den hay nau|den va nau)\b/, 'Smart Backpack có hai màu Đen và Nâu. Trang Sản phẩm có ảnh thật và mô phỏng 360° cho cả hai màu.'],
   [/\b(bao hanh|doi tra)\b/, 'CarryX dự kiến bảo hành 6 tháng cho khóa vân tay và cổng USB với lỗi kỹ thuật từ nhà sản xuất. Bạn có thể quét mã QR trên thẻ để kích hoạt bảo hành điện tử. Với đổi trả, bạn nhắn Zalo để nhóm tư vấn theo đơn nhé.'],
   [/\b(laptop|may tinh|inch|chong soc)\b/, 'Ngăn laptop của Smart Backpack có đệm chống sốc, phù hợp với laptop tối đa 15,6 inch.'],
