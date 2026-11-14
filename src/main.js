@@ -76,8 +76,8 @@ function productCards() {
 
 function home() {
   return `<section class="hero"><div class="container"><div class="hero-grid"><div class="hero-copy"><span class="eyebrow hero-enter">SMART CARRY, SAFE LIFE</span><h1><span class="hero-line">Balo thông minh</span> <span class="hero-line">mang theo</span> <span class="hero-line">cuộc sống hiện đại</span></h1><p class="hero-enter hero-description">Từ giảng đường đến văn phòng. Một chiếc balo gọn gàng, tiện lợi và an tâm hơn cho mỗi ngày bạn đi.</p><div class="hero-actions hero-enter"><button class="button" data-scroll="colors">Khám phá hai màu balo ${arrow}</button>${button('Câu chuyện CarryX', '#/ve-carryx', 'button-text')}</div><span class="soft-label hero-enter">Đen & Nâu <span>·</span> Smart Backpack</span></div><div class="hero-visual hero-enter"><img
-      src="/images/hero-carryx-960.webp"
-      srcset="/images/hero-carryx-960.webp 960w, /images/hero-carryx-1920.webp 1920w"
+      src="/images/hero-facebook-960.webp"
+      srcset="/images/hero-facebook-960.webp 960w, /images/hero-facebook-1366.jpg 1366w"
       sizes="(max-width: 760px) calc(100vw - 48px), (max-width: 1440px) 50vw, 720px"
       width="960" height="1440" fetchpriority="high" decoding="async"
       alt="Balo CarryX màu đen trong một ngày di chuyển thực tế"
