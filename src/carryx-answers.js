@@ -18,17 +18,18 @@ const plannedProducts = roadmap.flatMap(({ year, items }) => items.map(([name, d
 
 const topics = [
   [/\b(gia|bao nhieu tien|bao tien|chi phi)\b/, `Giá dự kiến của CarryX Smart Backpack là ${formatBackpackPrice('black')} ₫ cho màu Đen và ${formatBackpackPrice('brown')} ₫ cho màu Nâu. Bạn có thể nhắn Zalo để hỏi tình trạng đặt hàng.`],
-  [/\b(mau|den hay nau|den va nau)\b/, 'Smart Backpack có hai màu Đen và Nâu. Trang Sản phẩm có ảnh thật và mô phỏng 360° cho cả hai màu.'],
-  [/\b(bao hanh|doi tra)\b/, 'CarryX dự kiến bảo hành 6 tháng cho khóa vân tay và cổng USB với lỗi kỹ thuật từ nhà sản xuất. Bạn có thể quét mã QR trên thẻ để kích hoạt bảo hành điện tử. Với đổi trả, bạn nhắn Zalo để nhóm tư vấn theo đơn nhé.'],
+  [/\b(mau|den hay nau|den va nau)\b/, 'Smart Backpack có hai màu Đen và Nâu. Trang Sản phẩm có ảnh chụp thật cho cả hai màu.'],
+  [/\b(bao hanh|doi tra)\b/, 'CarryX dự kiến bảo hành 6 tháng cho khóa vân tay trên cả hai màu và cổng USB trên balo Đen với lỗi kỹ thuật từ nhà sản xuất. Bạn có thể quét mã QR trên thẻ để kích hoạt bảo hành điện tử. Với đổi trả, bạn nhắn Zalo để nhóm tư vấn theo đơn nhé.'],
   [/\b(laptop|may tinh|inch|chong soc)\b/, 'Ngăn laptop của Smart Backpack có đệm chống sốc, phù hợp với laptop tối đa 15,6 inch.'],
   [/\b(khang nuoc|chong nuoc|di mua|troi mua|gap mua|da pu|chat lieu|polyester|ve sinh|giat)\b/, 'Vỏ balo làm từ da PU kháng nước, lót polyester. Khi gặp mưa, bạn lau khô bằng khăn mềm. Tránh ngâm balo trong nước.'],
+  [/\b(day deo|quai deo|tro luc)\b/, 'Cả balo Đen và Nâu đều có dây đeo trợ lực có đệm để mang thoải mái hơn.'],
   [/\b(van tay|khoa|mo khoa|bao mat)\b/, 'Ngăn chính dùng khóa vân tay đã đăng ký. Trong hộp có hướng dẫn đăng ký và sạc khóa. Bạn có thể nhắn Zalo để nhóm hướng dẫn thiết lập hoặc xử lý lỗi nhận vân tay.'],
-  [/\b(usb|sac dien thoai|cong sac)\b|\bbalo\b.*\bsac du phong\b/, 'Cổng USB trên balo kết nối với sạc dự phòng bạn đặt bên trong, để sạc điện thoại từ bên ngoài.'],
+  [/\b(usb|sac dien thoai|cong sac)\b|\bbalo\b.*\bsac du phong\b/, 'Cổng USB chỉ có trên balo Đen. Cổng này kết nối với sạc dự phòng bạn đặt bên trong, để sạc điện thoại từ bên ngoài.'],
   [/\b(mua o dau|muon mua|mua the nao|mua hang|dat hang|con hang|giao hang|van chuyen|ship|thanh toan|lien he|hotline|zalo|ra mat)\b/, 'Bạn có thể nhắn Zalo hoặc gọi CarryX qua số 0378 319 358 để hỏi tình trạng hàng, cách đặt và giao nhận.'],
   [/\b(fpt|nhom sang lap|thuong hieu|carryx la gi)\b/, 'CarryX là dự án của nhóm sinh viên Đại học FPT, phát triển balo và phụ kiện giúp sắp xếp, bảo vệ đồ dùng hằng ngày.'],
 ];
 
-const overview = 'CarryX Smart Backpack có hai màu Đen và Nâu, khóa vân tay ở ngăn chính, ngăn laptop tối đa 15,6 inch và cổng USB dùng cùng sạc dự phòng. Bạn muốn tìm hiểu giá, cách dùng hay bảo hành?';
+const overview = 'CarryX Smart Backpack có hai màu Đen và Nâu, khóa vân tay ở ngăn chính, ngăn laptop tối đa 15,6 inch và dây đeo trợ lực. Cổng USB dùng cùng sạc dự phòng có trên balo Đen. Bạn muốn tìm hiểu giá, cách dùng hay bảo hành?';
 const yearWords = { mot: 1, hai: 2, ba: 3, bon: 4, tu: 4, nam: 5 };
 
 export function createCarryResponder() {

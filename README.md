@@ -16,15 +16,10 @@ Bản production là thư mục `dist/`, có thể phục vụ bằng static hos
 ## Chức năng
 
 - Trang chủ, sản phẩm, chi tiết Smart Backpack, giới thiệu và liên hệ.
-- Viewer Three.js xoay đủ 360° bằng kéo/vuốt, nút đổi góc, tự xoay, reset và phóng lớn.
-- Đổi màu Đen/Nâu trong trang chi tiết; chọn ảnh chụp thật bằng thumbnail.
+- Xem ảnh chụp thật, đổi màu Đen/Nâu và chọn chi tiết qua ảnh thu nhỏ.
 - Lộ trình Năm 2–5 trình bày bằng tab, giữ rõ nhãn dự kiến.
 - Form tạo lời nhắn ngay trên trình duyệt; người dùng sao chép và tự gửi qua Zalo. Không có máy chủ thu thập nội dung form.
 - Animation khi cuộn, chuyển trang, hover, menu và FAQ; hỗ trợ `prefers-reduced-motion`.
-
-## Lưu ý về 360°
-
-Mô hình trong `src/viewer.js` được dựng bằng hình học 3D theo ảnh tham khảo, không phải bản quét chính xác của sản phẩm. Giao diện luôn ghi rõ “Mô phỏng 3D” và cung cấp ảnh chụp thật để đối chiếu. Khi có file GLB/GLTF chuẩn của CarryX, có thể thay hàm `createBag()` bằng mô hình đó và giữ các điều khiển hiện tại.
 
 ## Nội dung và ảnh
 
@@ -34,4 +29,4 @@ Website không có giỏ hàng hoặc thanh toán. Điện thoại và Zalo dùn
 
 ## Kiểm tra đã thực hiện
 
-Kiểm tra trực tiếp trên trình duyệt ở desktop và viewport 390px: xoay 3D, đổi màu, chuyển ảnh thật, mở/đóng viewer phóng lớn, menu mobile, tab lộ trình, FAQ, tạo lời nhắn, ảnh lỗi và tràn ngang. Kiểm tra cú pháp JavaScript, build production và audit dependencies.
+Kiểm tra trực tiếp trên trình duyệt ở desktop và viewport 390px: đổi màu, chọn ảnh sản phẩm, menu mobile, tab lộ trình, FAQ, tạo lời nhắn, ảnh lỗi và tràn ngang. Kiểm tra cú pháp JavaScript, build production và audit dependencies.
